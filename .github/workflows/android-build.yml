@@ -56,7 +56,7 @@ jobs:
     name: Build Android APK (Local Gradle)
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    if: false  # Desabilitado por padrão - habilite se quiser build local
+    if: true  # Habilitado - build local com Gradle direto
 
     steps:
       - name: Checkout repository

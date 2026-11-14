@@ -3,64 +3,52 @@ name: Build Android APK
 on:
   push:
     branches: [main]
-  workflow_dispatch: # permite trigger manual
+  workflow_dispatch:
   pull_request:
     branches: [main]
 
 jobs:
   build:
-    name: Build Android APK
+    name: Build Android APK (EAS)
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-          packager: npm
-
-      - name: Install EAS CLI
+      - name: Setup EAS CLI
         run: npm install -g eas-cli
 
       - name: Build Android APK (preview)
-        run: eas build --platform android --profile preview --non-interactive --no-wait
+        run: eas build --platform android --profile preview --non-interactive --wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Wait for build to complete
+      - name: Download APK from EAS
         run: |
-          # O build com --no-wait retorna o build ID
-          # Vamos esperar o build completar
-          echo "Build iniciado. Aguardando conclusão..."
-
-      - name: Download build artifact
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-          command: build:download --platform android --profile preview --latest
+          BUILD_ID=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].id')
+          eas build:download --build-id $BUILD_ID --output ./mobility-free.apk
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
         with:
           name: mobility-free-apk
-          path: |
-            *.apk
-            android/app/build/outputs/apk/**/*.apk
+          path: mobility-free.apk
           retention-days: 30
 
   # Job alternativo: Build local com Gradle (sem EAS)
@@ -74,10 +62,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Setup Java 17

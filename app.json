@@ -1,24 +1,80 @@
 {
   "expo": {
-    "name": "mobsfree",
-    "slug": "mobsfree",
+    "name": "Mobility Free",
+    "slug": "mobility-free",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/icons/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/icons/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0F"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Permitir que o Mobility acesse sua galeria de fotos para ler quadrados de WOD?",
+        "NSCameraUsageDescription": "Permitir que o Mobility acesse a câmera para ler quadrados de WOD?"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+        "foregroundImage": "./assets/icons/icon-foreground.png",
+        "backgroundColor": "#0A0A0F"
+      },
+      "package": "com.rev.reserva.mobilityfree",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/icons/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-sqlite",
+        {
+          "location": "default"
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "isDesignSizeAdjusted": true
+        }
+      ],
+      [
+        "expo-image-picker"
+      ],
+      "expo-notifications",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "newArchEnabled": false,
+            "hermesEnabled": false
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "b4bea5e2-bcdb-4bf0-b0ad-684a7d9265ee"
+      }
+    },
+    "owner": "diegoaksenen"
   }
 }

@@ -188,7 +188,8 @@ const styles = {
     backgroundColor: '#1A1A24',
     borderRadius: 16,
     padding: 20,
-    margin: 0 24 24,
+    marginHorizontal: 24,
+    marginBottom: 24,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -214,7 +215,7 @@ const styles = {
     backgroundColor: '#1A1A24',
     borderRadius: 16,
     padding: 20,
-    margin: 0 24,
+    marginHorizontal: 24,
   },
   streakTitle: {
     color: '#6E6E7A',

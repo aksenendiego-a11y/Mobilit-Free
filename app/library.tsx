@@ -140,7 +140,8 @@ const styles = {
     marginLeft: 'auto',
   },
   searchContainer: {
-    padding: 0 24 24,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
     marginLeft: -24,
     marginRight: -24,
   },
@@ -155,7 +156,8 @@ const styles = {
     color: '#F8F8F8',
   },
   filters: {
-    padding: 0 24 24,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
     marginLeft: -24,
     marginRight: -24,
     gap: 8,

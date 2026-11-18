@@ -12,7 +12,12 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
+        "image": "latest",
+        "node": "20.18.0",
+        "gradleCommand": ":app:assembleRelease",
+        "env": {
+          "NODE_OPTIONS": "--max-old-space-size=4096"
+        }
       }
     },
     "production": {

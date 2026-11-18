@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Switch,,
+  View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Switch,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, StatusBar } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar, View, Text } from 'react-native';
 import { Header } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
@@ -14,7 +14,7 @@ export default function Root() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content' />
+      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
       <Header />
       {user ? null : (
         <View style={styles.onboardingPlaceholder}>

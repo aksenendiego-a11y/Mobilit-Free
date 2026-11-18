@@ -4,68 +4,21 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  pull_request:
-    branches: [main]
 
 jobs:
   build:
-    name: Build Android APK (EAS)
+    name: Build Android APK
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Setup EAS CLI
-        run: npm install -g eas-cli
-
-      - name: Build Android APK (preview)
-        run: eas build --platform android --profile preview --non-interactive --wait
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Download APK from EAS
-        run: |
-          BUILD_ID=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].id')
-          eas build:download --build-id $BUILD_ID --output ./mobility-free.apk
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mobility-free-apk
-          path: mobility-free.apk
-          retention-days: 30
-
-  # Job alternativo: Build local com Gradle (sem EAS)
-  build-local:
-    name: Build Android APK (Local Gradle)
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    if: true  # Habilitado - build local com Gradle direto
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
 
       - name: Setup Java 17
@@ -73,46 +26,49 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
         with:
-          api-level: 34
-          ndk-version: r26b
-          emulator: false
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
+        working-directory: ./mobsfree
 
-      - name: Generate native code
-        run: npx expo prebuild --platform android
+      - name: Configure EAS
+        run: |
+          cd mobsfree
+          eas build:configure -p android --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build APK with Gradle
-        working-directory: ./android
-        run: ./gradlew assembleRelease --no-daemon
+      - name: Build Android APK (Preview)
+        run: |
+          cd mobsfree
+          eas build --platform android --profile preview --non-interactive --wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Upload APK
+      - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mobility-free-apk-local
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: mobility-free-apk
+          path: |
+            mobsfree/*.apk
+            mobsfree/android/app/build/outputs/apk/**/*.apk
           retention-days: 30
 
-  # Notificação quando build completa
-  notify:
-    name: Notify Build Complete
-    runs-on: ubuntu-latest
-    needs: [build]
-    if: always()
-    steps:
-      - name: Notify success
-        if: needs.build.result == 'success'
-        run: |
-          echo "✅ Build concluído com sucesso!"
-          echo "APK disponível para download nos artifacts do workflow."
-
-      - name: Notify failure
-        if: needs.build.result == 'failure'
-        run: |
-          echo "❌ Build falhou. Verifique os logs."
-          exit 1
+      - name: Create Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            mobsfree/*.apk
+            mobsfree/android/app/build/outputs/apk/**/*.apk
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

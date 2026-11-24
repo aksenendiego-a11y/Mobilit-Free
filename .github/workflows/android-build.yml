@@ -21,23 +21,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Generate package-lock.json
+        run: |
+          cd mobsfree
+          if [ ! -f package-lock.json ]; then
+            echo "package-lock.json not found, generating..."
+            npm install --package-lock-only --legacy-peer-deps
+          else
+            echo "package-lock.json found"
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: mobsfree/package-lock.json
-
-      - name: Ensure package-lock.json exists
-        run: |
-          if [ ! -f mobsfree/package-lock.json ]; then
-            echo "package-lock.json not found, generating..."
-            cd mobsfree
-            npm install --package-lock-only --legacy-peer-deps
-          else
-            echo "package-lock.json found"
-          fi
-        working-directory: ./
 
       - name: Setup Java 17
         uses: actions/setup-java@v4

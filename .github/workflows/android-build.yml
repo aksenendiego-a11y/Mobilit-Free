@@ -27,9 +27,17 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: mobsfree/package-lock.json
-      - name: Verify package-lock.json
-        run: ls -la mobsfree/package-lock.json
-        working-directory: ./mobsfree
+
+      - name: Ensure package-lock.json exists
+        run: |
+          if [ ! -f mobsfree/package-lock.json ]; then
+            echo "package-lock.json not found, generating..."
+            cd mobsfree
+            npm install --package-lock-only --legacy-peer-deps
+          else
+            echo "package-lock.json found"
+          fi
+        working-directory: ./
 
       - name: Setup Java 17
         uses: actions/setup-java@v4

@@ -49,6 +49,7 @@ jobs:
         with:
           gradle-version: '8.5'
           cache-read-only: false
+        working-directory: ./mobsfree
 
       - name: Setup Expo
         uses: expo/expo-github-action@v8
@@ -59,12 +60,14 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
+        working-directory: ./mobsfree
 
       - name: Configure EAS
         run: |
           eas build:configure -p android --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        working-directory: ./mobsfree
 
       - name: Build Android APK (Preview)
         run: |
@@ -72,14 +75,15 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         timeout-minutes: 45
+        working-directory: ./mobsfree
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
         with:
           name: mobility-free-apk
           path: |
-            *.apk
-            android/app/build/outputs/apk/**/*.apk
+            mobsfree/*.apk
+            mobsfree/android/app/build/outputs/apk/**/*.apk
           retention-days: 30
           compression-level: 6
 
@@ -88,8 +92,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            *.apk
-            android/app/build/outputs/apk/**/*.apk
+            mobsfree/*.apk
+            mobsfree/android/app/build/outputs/apk/**/*.apk
           generate_release_notes: true
           draft: false
           prerelease: false

@@ -23,7 +23,6 @@ jobs:
 
       - name: Generate package-lock.json
         run: |
-          cd mobsfree
           if [ ! -f package-lock.json ]; then
             echo "package-lock.json not found, generating..."
             npm install --package-lock-only --legacy-peer-deps
@@ -36,7 +35,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: mobsfree/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -60,18 +59,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
-        working-directory: ./mobsfree
 
       - name: Configure EAS
         run: |
-          cd mobsfree
           eas build:configure -p android --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android APK (Preview)
         run: |
-          cd mobsfree
           eas build --platform android --profile preview --non-interactive --wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -82,8 +78,8 @@ jobs:
         with:
           name: mobility-free-apk
           path: |
-            mobsfree/*.apk
-            mobsfree/android/app/build/outputs/apk/**/*.apk
+            *.apk
+            android/app/build/outputs/apk/**/*.apk
           retention-days: 30
           compression-level: 6
 
@@ -92,8 +88,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            mobsfree/*.apk
-            mobsfree/android/app/build/outputs/apk/**/*.apk
+            *.apk
+            android/app/build/outputs/apk/**/*.apk
           generate_release_notes: true
           draft: false
           prerelease: false

@@ -16,6 +16,9 @@ jobs:
       contents: read
       packages: read
       id-token: write
+    defaults:
+      run:
+        working-directory: ./mobsfree
 
     steps:
       - name: Checkout code
@@ -43,6 +46,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
+        working-directory: ./mobsfree
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
